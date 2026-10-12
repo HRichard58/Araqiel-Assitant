@@ -1,0 +1,27 @@
+# Araqiel
+
+Assistant IA de bureau : interface Electron + backend Flask (`IA.py`), mode vocal, mode codage et accès téléphone.
+
+## Démarrage (développement)
+1. `pip install -r requirements.txt` (puis `playwright install chromium` si tu utilises l'agent navigateur)
+2. `npm install`
+3. Crée tes fichiers de clés à côté de `IA.py` (une clé par fichier, une seule ligne) :
+   - `openrouter.key` : cerveau principal (préfixe `sk-or-`)
+   - `elevenlabs.key` : voix et transcription (préfixe `sk_`)
+   - `coder.key` + `coder.json` : agent du mode codage (copie `coder.example.json`)
+4. Double-clique sur `Executer.bat` (ou `npm start`).
+
+Au tout premier lancement, un compte `admin` est créé avec un mot de passe aléatoire **affiché une seule fois dans la console**.
+Tu peux le choisir avec `ARAQIEL_ADMIN_USER` / `ARAQIEL_ADMIN_PASS` avant le premier démarrage.
+
+## Version installée (`npm run build`)
+Python 3 et `pip install -r requirements.txt` restent nécessaires sur la machine. Le backend est lancé par Electron ;
+la base de données, les `.key` et `coder.json` se placent dans le dossier de données de l'application
+(`%APPDATA%\araqiel-assistant`). Variable `ARAQIEL_PYTHON` pour choisir l'exécutable Python.
+
+## Ports
+- 5000 : backend Flask, **local uniquement** (127.0.0.1)
+- 3000 : serveur du téléphone (protégé par un code d'accès à 6 chiffres)
+
+## Mot de réveil
+Dans le mode vocal, « Mot de réveil » transcrit chaque phrase et ne traite que celles contenant « Araqiel ».
