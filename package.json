@@ -1,0 +1,78 @@
+{
+  "name": "araqiel-assistant",
+  "version": "1.1.0",
+  "description": "Araqiel Assistant OS",
+  "main": "main.js",
+  "scripts": {
+    "start": "concurrently -k -n FLASK,UI -c cyan,magenta \"python IA.py\" \"electron .\"",
+    "start:silent": "concurrently -k \"pythonw IA.py\" \"electron .\"",
+    "backend:install": "pip install -r requirements.txt",
+    "build": "electron-builder"
+  },
+  "keywords": [],
+  "author": "Hugo Richard",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "qrcode": "^1.5.3",
+    "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.0"
+  },
+  "build": {
+    "appId": "com.araqiel.assistant",
+    "productName": "Araqiel Assistant",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "renderer.js",
+      "styles.css",
+      "voice.js",
+      "voice.css",
+      "coding.css",
+      "!release/**",
+      "!**/*.key",
+      "!**/*.db",
+      "!coder.json",
+      "!**/__pycache__/**"
+    ],
+    "extraResources": [
+      {
+        "from": "IA.py",
+        "to": "backend/IA.py"
+      },
+      {
+        "from": "requirements.txt",
+        "to": "backend/requirements.txt"
+      },
+      {
+        "from": "coder.example.json",
+        "to": "backend/coder.example.json"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Araqiel Assistant"
+    }
+  }
+}

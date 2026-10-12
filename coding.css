@@ -1,0 +1,71 @@
+/* =====================================================================
+   ARAQIEL — Mode codage (CODEX)
+   Bouton bascule dans l'en-tête + blocs de code dans les réponses.
+   ===================================================================== */
+
+#code-mode-btn {
+  margin-left: 12px;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid var(--panel-border);
+  color: var(--text-muted);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-family: ui-monospace, Consolas, monospace;
+  cursor: pointer;
+  transition: var(--transition);
+}
+#code-mode-btn:hover { color: var(--cyan); border-color: var(--cyan); }
+#code-mode-btn.on {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: #10b981;
+  color: #34d399;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.3);
+}
+
+/* En mode code, le composeur passe en vert + police monospace */
+body.code-mode .composer-container { border-color: rgba(16, 185, 129, 0.45); }
+body.code-mode .composer textarea { font-family: ui-monospace, Consolas, monospace; }
+body.code-mode header .header-left span { color: #34d399; }
+
+/* Blocs de code */
+.code-block {
+  margin: 10px 0;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #020617;
+  text-align: left;
+}
+.code-block-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+  background: rgba(56, 189, 248, 0.08);
+  font-size: 11px;
+  color: var(--cyan-bright);
+  font-family: ui-monospace, Consolas, monospace;
+}
+.code-block-head button {
+  background: none;
+  border: 1px solid var(--panel-border);
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.code-block-head button:hover { color: var(--cyan); border-color: var(--cyan); }
+.code-block pre {
+  margin: 0;
+  padding: 12px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.code-block code {
+  font-family: ui-monospace, Consolas, "Courier New", monospace;
+  color: #e2e8f0;
+  white-space: pre;
+}

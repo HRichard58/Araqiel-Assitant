@@ -1,0 +1,211 @@
+/* =====================================================================
+   ARAQIEL — Mode vocal
+   Reprend la palette cyan existante. --voice-level (0 à 1) est mis à jour
+   ~60 fois par seconde par voice.js et pilote toute l'animation.
+   ===================================================================== */
+
+:root {
+  --voice-level: 0;
+  --amber: #f59e0b;
+}
+
+/* ------------------------------------------------------- Bouton micro */
+
+#mic-btn {
+  background: rgba(56, 189, 248, 0.1) !important;
+  border: 1px solid var(--panel-border) !important;
+  color: var(--cyan-bright) !important;
+  position: relative;
+}
+
+#mic-btn.active {
+  background: var(--cyan) !important;
+  color: #030712 !important;
+  box-shadow: 0 0 18px var(--cyan-glow);
+}
+
+#mic-btn.active::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 10px;
+  border: 1px solid var(--cyan);
+  opacity: calc(0.2 + var(--voice-level) * 0.8);
+  transform: scale(calc(1 + var(--voice-level) * 0.25));
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------ Overlay */
+
+#voice-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  background: radial-gradient(circle at 50% 45%, rgba(2, 132, 199, 0.16), rgba(3, 7, 18, 0.94) 60%);
+  backdrop-filter: blur(18px);
+}
+
+#voice-overlay.open { display: flex; }
+
+/* ---------------------------------------------------------- Orbe vive */
+
+.voice-orb {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.voice-orb .vcore {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 8%, var(--cyan) 48%, var(--blue-electric) 100%);
+  transform: scale(calc(0.86 + var(--voice-level) * 0.55));
+  box-shadow:
+    0 0 calc(30px + var(--voice-level) * 70px) var(--cyan),
+    0 0 calc(70px + var(--voice-level) * 140px) var(--cyan-glow);
+  transition: transform 80ms linear, box-shadow 80ms linear;
+}
+
+.voice-orb .vring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid transparent;
+}
+
+.vring.r1 {
+  width: 150px; height: 150px;
+  border-top-color: var(--cyan);
+  border-bottom-color: var(--cyan);
+  animation: vspin 3.6s linear infinite;
+}
+
+.vring.r2 {
+  width: 195px; height: 195px;
+  border-left-color: var(--cyan-bright);
+  border-right-color: var(--cyan-bright);
+  border-style: dashed;
+  animation: vspin 5.5s linear infinite reverse;
+}
+
+.vring.r3 {
+  width: 240px; height: 240px;
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-top-color: var(--cyan);
+  animation: vspin 11s linear infinite;
+}
+
+/* Halo qui suit la voix */
+.voice-orb .vhalo {
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  border: 1px solid var(--cyan);
+  opacity: calc(var(--voice-level) * 0.7);
+  transform: scale(calc(0.8 + var(--voice-level) * 0.4));
+  pointer-events: none;
+}
+
+@keyframes vspin {
+  from { transform: rotateX(18deg) rotateY(0deg) rotateZ(0deg); }
+  to   { transform: rotateX(18deg) rotateY(360deg) rotateZ(360deg); }
+}
+
+/* ------------------------------------------------- États de l'assistant */
+
+body[data-voice="thinking"] .vring { animation-duration: 0.9s, 0.9s; }
+body[data-voice="thinking"] .vring.r1 { border-top-color: var(--amber); border-bottom-color: var(--amber); }
+body[data-voice="thinking"] .vcore {
+  background: radial-gradient(circle, #fff 8%, var(--amber) 55%, #b45309 100%);
+  box-shadow: 0 0 45px var(--amber), 0 0 90px rgba(245, 158, 11, 0.4);
+}
+
+body[data-voice="speaking"] .vring.r2 { border-style: solid; }
+
+/* Ondes concentriques pendant l'écoute */
+body[data-voice="listening"] .voice-orb::before,
+body[data-voice="listening"] .voice-orb::after {
+  content: "";
+  position: absolute;
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  border: 1px solid var(--cyan);
+  animation: vwave 2.6s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+}
+body[data-voice="listening"] .voice-orb::after { animation-delay: 1.3s; }
+
+@keyframes vwave {
+  0%   { width: 80px;  height: 80px;  opacity: 0.75; }
+  100% { width: 300px; height: 300px; opacity: 0; }
+}
+
+/* ----------------------------------------------------------- Textes */
+
+#voice-status {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--cyan-bright);
+  min-height: 16px;
+}
+
+#voice-caption {
+  max-width: 620px;
+  text-align: center;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--text-main);
+  min-height: 54px;
+  padding: 0 24px;
+}
+
+/* --------------------------------------------------------- Commandes */
+
+.voice-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.voice-controls button {
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid var(--panel-border);
+  color: var(--text-muted);
+  padding: 9px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.voice-controls button:hover {
+  color: var(--cyan);
+  border-color: var(--cyan);
+}
+
+.voice-controls button.on {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.voice-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vring, body[data-voice="listening"] .voice-orb::before,
+  body[data-voice="listening"] .voice-orb::after { animation: none; }
+}
+
+#voice-overlay .voice-controls button.on { box-shadow: 0 0 18px rgba(56,189,248,.25); }

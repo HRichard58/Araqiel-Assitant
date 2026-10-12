@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Araqiel Assistant</title>
+
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="voice.css">
+  <link rel="stylesheet" href="coding.css">
+</head>
+<body>
+  <div class="ambient a"></div>
+  <div class="ambient b"></div>
+
+  <!-- AUTHENTIFICATION -->
+  <div id="section-auth">
+    <div class="auth-container">
+      <div class="auth-header">
+        <h2>ARAQIEL AI</h2>
+      </div>
+
+      <div class="auth-switch">
+        <button id="btn-toggle-login" class="auth-tab active">Connexion</button>
+        <button id="btn-toggle-register" class="auth-tab">Inscription</button>
+      </div>
+
+      <div id="page-auth-error" class="settings-status"></div>
+
+      <div id="auth-form-login">
+        <div class="setting-row">
+          <label>Compte</label>
+          <input type="text" id="auth-login-user" placeholder="Nom d'utilisateur">
+        </div>
+        <div class="setting-row">
+          <label>Mot de passe</label>
+          <input type="password" id="auth-login-pass" placeholder="••••••••">
+        </div>
+        <button id="auth-do-login" class="primary-btn">Se connecter</button>
+      </div>
+
+      <div id="auth-form-register" style="display: none;">
+        <div class="setting-row">
+          <label>Compte</label>
+          <input type="text" id="auth-reg-user" placeholder="Choisis un nom d'utilisateur">
+        </div>
+        <div class="setting-row">
+          <label>Mot de passe</label>
+          <input type="password" id="auth-reg-pass" placeholder="••••••••">
+        </div>
+        <button id="auth-do-register" class="primary-btn">Créer un compte</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICATION PRINCIPALE -->
+  <div class="shell">
+    <aside id="sidebar">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <strong>ARAQIEL</strong>
+          <small>SYSTEM v2.0</small>
+        </div>
+      </div>
+
+      <button id="new" class="new">+ Nouvelle conversation</button>
+
+      <div class="label">HISTORIQUE</div>
+      <div id="history" class="history"></div>
+
+      <div class="bottom">
+        <div class="online">
+          <em></em> Système en ligne
+        </div>
+        <button id="connect-phone-btn">📱 Connecter mon téléphone</button>
+        <button id="view-logs-btn">🗂 Journaux du téléphone</button>
+        <button id="logout-btn">Déconnexion</button>
+      </div>
+    </aside>
+
+    <main>
+      <header>
+        <div class="header-left">
+          <button id="toggle-sidebar-btn" title="Afficher / masquer l'historique">☰</button>
+          <span>ARAQIEL INTERFACE</span>
+          <button id="code-mode-btn" title="Mode codage (agent configuré dans coder.json)">&lt;/&gt; Code</button>
+        </div>
+        <div class="header-profile">
+          <span id="user-display-name">Hugo</span>
+          <div class="window-controls">
+            <button id="win-min" title="Réduire" onclick="window.araqielWindow?.minimize()">−</button>
+            <button id="win-close" title="Fermer" onclick="window.araqielWindow?.close()">×</button>
+          </div>
+        </div>
+      </header>
+
+      <div id="section-main">
+        <div id="jarvis-container" class="jarvis-center">
+          <div class="jarvis-orb">
+            <div class="pulse-wave"></div>
+            <div class="pulse-wave p2"></div>
+            <div class="ring ring-1"></div>
+            <div class="ring ring-2"></div>
+            <div class="ring ring-3"></div>
+            <div class="core-glow"></div>
+          </div>
+          <h2>Bonjour.</h2>
+          <p>Comment puis-je t'aider ?</p>
+        </div>
+
+        <div id="chat"></div>
+
+        <div id="quick" class="quick">
+          <button data-p="/folder C:\AraqielProjects">
+            <strong>Créer un dossier</strong>
+            <small>Ex : /folder C:\MonDossier</small>
+          </button>
+          <button data-p="/file C:\AraqielProjects\test.txt|Bonjour Araqiel">
+            <strong>Créer un fichier</strong>
+            <small>Ex : /file C:\test.txt|contenu</small>
+          </button>
+        </div>
+
+        <div class="composer-container">
+          <div id="attachment-preview" class="attachment-preview" style="display: none;">
+            <span id="attachment-name">file.txt</span>
+            <button id="remove-attachment-btn" style="background:none; border:none; color:#ef4444; cursor:pointer;">×</button>
+          </div>
+
+          <div class="composer">
+            <input type="file" id="file-input" style="display: none;">
+            <button id="attach-btn" title="Joindre un fichier">📎</button>
+            <textarea id="input" rows="1" placeholder="Écris ici…"></textarea>
+            <button id="mic-btn" title="Parler à Araqiel (Ctrl + Espace)">🎙</button>
+            <button id="send" class="send">➔</button>
+          </div>
+        </div>
+
+        <div class="hint">Maj + Entrée : nouvelle ligne · Ctrl + Espace : parler · Téléphone : en local sur le Wi-Fi ou à distance via un tunnel HTTPS</div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODE VOCAL -->
+  <div id="voice-overlay">
+    <div class="voice-orb">
+      <div class="vhalo"></div>
+      <div class="vring r1"></div>
+      <div class="vring r2"></div>
+      <div class="vring r3"></div>
+      <div class="vcore"></div>
+    </div>
+
+    <div id="voice-status"></div>
+    <div id="voice-caption"></div>
+
+    <div class="voice-controls">
+      <button id="voice-stop">Stop</button>
+      <button id="voice-continuous">Conversation</button>
+      <button id="voice-wake">Mot de réveil « Araqiel »</button>
+      <button id="voice-close">Fermer</button>
+    </div>
+
+    <div class="voice-hint">Échap pour quitter le mode vocal</div>
+  </div>
+
+  <!-- CONNEXION TÉLÉPHONE -->
+  <div id="phone-modal-overlay">
+    <div class="phone-modal">
+      <div class="phone-modal-header">
+        <h3>Connect your phone</h3>
+        <button id="phone-modal-close">×</button>
+      </div>
+
+      <p class="phone-modal-hint">Sur le même Wi-Fi, utilisez l'adresse locale. Pour vous connecter depuis n'importe quel réseau, activez l'accès hors Wi-Fi ci-dessous.</p>
+
+      <div id="phone-qr-wrap">
+        <img id="phone-qr-img" alt="QR code de connexion" style="display:none;">
+        <div id="phone-qr-fallback">Génération du QR code...</div>
+      </div>
+
+      <div class="phone-url-row">
+        <input type="text" id="phone-url-value" readonly>
+        <button id="phone-url-copy">Copier</button>
+      </div>
+
+      <div class="phone-pin-box">
+        <div class="phone-pin-label">Code d'accès (à saisir une fois sur le téléphone) :</div>
+        <div class="phone-pin-row">
+          <span id="phone-pin-value">------</span>
+          <button id="phone-pin-regenerate" title="Générer un nouveau code (déconnecte les futurs téléphones non encore validés)">↻ Nouveau code</button>
+        </div>
+      </div>
+
+      <div id="phone-modal-status" class="settings-status"></div>
+
+      <div class="phone-remote-section">
+        <div class="phone-remote-header">
+          <strong>Accès hors Wi-Fi</strong>
+          <span id="phone-remote-badge" class="phone-remote-badge off">Désactivé</span>
+        </div>
+        <p class="phone-modal-hint">
+          Crée une adresse HTTPS temporaire accessible depuis n'importe quel réseau (4G/5G, autre Wi-Fi...).
+          Le code d'accès ci-dessus reste obligatoire. Le lien est recréé lorsque le tunnel est relancé.
+        </p>
+        <button id="phone-remote-toggle" class="primary-btn">Activer l'accès hors Wi-Fi</button>
+
+        <div id="phone-remote-qr-wrap" style="display:none;">
+          <img id="phone-remote-qr-img" alt="QR code accès distant">
+        </div>
+        <div class="phone-url-row" id="phone-remote-url-row" style="display:none;">
+          <input type="text" id="phone-remote-url-value" readonly>
+          <button id="phone-remote-url-copy">Copier</button>
+        </div>
+        <div id="phone-remote-status" class="settings-status"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+  <script src="voice.js"></script>
+</body>
+</html>

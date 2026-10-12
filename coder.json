@@ -1,0 +1,7 @@
+{
+  "provider": "custom",
+  "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+  "model": "gemini-3.8-flash",
+  "max_tokens": 8192,
+  "temperature": null
+}
