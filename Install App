@@ -1,0 +1,128 @@
+# Installer les dépendances d'Araqiel (npm install)
+
+Araqiel a deux moitiés qui s'installent séparément :
+
+| Partie | Technologie | Installation |
+|---|---|---|
+| Interface (fenêtre, serveur téléphone) | Node.js + Electron | `npm install` |
+| Backend IA (`IA.py`) | Python + Flask | `pip install -r requirements.txt` |
+
+Il faut **les deux** pour que l'application démarre.
+
+---
+
+## 1. Prérequis
+
+### Node.js (fournit `npm`)
+1. Télécharge la version **LTS** sur <https://nodejs.org> et installe-la (options par défaut).
+2. **Ferme puis rouvre** ton terminal.
+3. Vérifie :
+   ```
+   node -v
+   npm -v
+   ```
+
+### Python 3
+1. Télécharge Python 3 sur <https://www.python.org/downloads/>.
+2. Dans l'installateur, **coche « Add Python to PATH »** avant de cliquer sur *Install*.
+3. Vérifie :
+   ```
+   python --version
+   pip --version
+   ```
+
+---
+
+## 2. Installation pas à pas
+
+Ouvre un terminal **dans le dossier du projet** (le dossier qui contient `package.json`).
+Astuce : dans l'Explorateur, clique dans la barre d'adresse, tape `cmd` puis Entrée.
+
+```
+npm install
+pip install -r requirements.txt
+```
+
+### Facultatif : l'agent navigateur
+Si tu utilises les actions qui pilotent un navigateur (Playwright), installe aussi le navigateur :
+
+```
+playwright install chromium
+```
+
+### Facultatif : l'accès téléphone hors Wi-Fi
+Cette fonction utilise `cloudflared`. Télécharge `cloudflared.exe` (site de Cloudflare) et place-le **à côté de `main.js`**, ou installe-le et ajoute-le au PATH. Sans lui, tout le reste fonctionne ; seul le tunnel hors Wi-Fi est indisponible.
+
+---
+
+## 3. Ce que `npm install` installe
+
+**Dépendances** (utilisées par l'application) :
+
+| Paquet | Rôle |
+|---|---|
+| `express` | Serveur web pour la page du téléphone (port 3000) |
+| `ws` | WebSocket entre le téléphone et l'application |
+| `qrcode` | QR code de connexion du téléphone |
+
+**Outils de développement** :
+
+| Paquet | Rôle |
+|---|---|
+| `electron` | La fenêtre de l'application |
+| `concurrently` | Lance le backend Python et Electron en même temps |
+| `electron-builder` | Crée l'installateur `.exe` |
+
+L'opération crée un dossier `node_modules/`. Il peut être gros, et le premier téléchargement d'Electron prend quelques minutes : c'est normal. Ne le copie pas et ne l'envoie pas avec ton projet, il se recrée avec `npm install`.
+
+Pour reproduire **exactement** les versions du fichier `package-lock.json`, utilise `npm ci` à la place de `npm install`.
+
+---
+
+## 4. Lancer l'application
+
+- Double-clique sur **`Executer.bat`**, ou tape `npm start`.
+
+| Commande | Effet |
+|---|---|
+| `npm start` | Lance le backend (`python IA.py`) et l'interface Electron |
+| `npm run start:silent` | Pareil, sans fenêtre de console pour Python (`pythonw`) |
+| `npm run backend:install` | Équivaut à `pip install -r requirements.txt` |
+| `npm run build` | Crée l'installateur dans le dossier `release/` |
+
+N'oublie pas d'ajouter tes clés API avant le premier lancement (voir `INSTALLATION_CLES.md`).
+
+---
+
+## 5. Dépannage
+
+| Message / symptôme | Cause probable | Solution |
+|---|---|---|
+| `'npm' n'est pas reconnu...` | Node.js absent ou terminal ouvert avant l'installation | Installe Node.js, puis rouvre le terminal |
+| `npm.ps1 ne peut pas être chargé... l'exécution de scripts est désactivée` (PowerShell) | Politique d'exécution PowerShell | Utilise `cmd` à la place, ou lance une fois : `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` |
+| `'python' n'est pas reconnu...` | Python absent du PATH | Réinstalle Python en cochant « Add Python to PATH » |
+| `ModuleNotFoundError: No module named 'flask'` (ou `flask_cors`, `psutil`, `elevenlabs`...) | Dépendances Python non installées | `pip install -r requirements.txt` |
+| `Cannot find module 'express'` | `npm install` pas fait (ou fait dans un autre dossier) | Lance-le dans le dossier qui contient `package.json` |
+| Installation d'Electron qui échoue ou se bloque | Réseau, proxy ou antivirus | Réessaie ; vérifie ta connexion ; supprime `node_modules` puis relance `npm install` |
+| `EPERM` / `EACCES` | Droits insuffisants ou fichiers verrouillés | Ferme l'application et l'éditeur, relance le terminal en administrateur si besoin |
+| `Port 5000` ou `3000` déjà utilisé | Une ancienne instance tourne encore | Ferme-la (Gestionnaire des tâches : `python` ou `electron`) puis relance |
+| La fenêtre ne s'ouvre pas, le terminal attend | Le backend n'a pas démarré | Lis les messages `FLASK` dans la console : clé manquante ou module Python absent |
+| Avertissement sur le module `qrcode` | `npm install` incomplet | Relance `npm install` : sans lui, l'adresse s'affiche mais pas le QR code |
+
+### Repartir de zéro
+Si rien ne va, supprime le dossier `node_modules`, puis :
+
+```
+npm ci
+pip install -r requirements.txt
+```
+
+---
+
+## 6. Créer l'installateur (facultatif)
+
+```
+npm run build
+```
+
+L'installateur sort dans `release/`. Attention : Python 3 et `pip install -r requirements.txt` restent nécessaires sur la machine où l'application est installée, et les clés se placent dans `%APPDATA%\araqiel-assistant`.
