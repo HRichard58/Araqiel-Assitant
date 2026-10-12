@@ -1,0 +1,125 @@
+# Installer les clés API d'Araqiel (OpenRouter et Gemini)
+
+Araqiel utilise deux clés pour l'IA :
+
+| Clé | Fichier | Rôle |
+|---|---|---|
+| **OpenRouter** | `openrouter.key` | Cerveau principal (discussion, outils PC). Sert aussi de repli gratuit pour le mode codage. |
+| **Gemini (Google)** | `coder.key` + `coder.json` | Agent du **mode codage** (bouton `</> Code`). |
+
+Les deux sont indépendantes : tu peux n'en installer qu'une, mais le chat normal a besoin d'OpenRouter.
+
+---
+
+## 0. Où placer les fichiers
+
+| Version | Dossier |
+|---|---|
+| Développement (`Executer.bat` / `npm start`) | Le dossier du projet, **à côté de `IA.py`** |
+| Version installée (`.exe`) | `%APPDATA%\araqiel-assistant` (tape ça dans la barre d'adresse de l'Explorateur) |
+
+> Variable `ARAQIEL_DATA_DIR` : si elle est définie, c'est ce dossier qui est utilisé à la place.
+
+### Règles pour les fichiers `.key`
+- **Une seule ligne**, contenant uniquement la clé.
+- Pas d'espace, pas de guillemets autour (ils sont retirés automatiquement, mais mieux vaut s'en passer).
+- Une ligne qui commence par `#` est ignorée (commentaire).
+- **Piège Windows** : avec le Bloc-notes, choisis « Enregistrer sous », type **« Tous les fichiers »**, et nomme le fichier `openrouter.key`. Sinon tu obtiens `openrouter.key.txt`, qui n'est pas lu.
+  Active « Extensions de noms de fichiers » dans l'onglet *Affichage* de l'Explorateur pour vérifier.
+
+---
+
+## 1. Clé OpenRouter
+
+### Obtenir la clé
+1. Crée un compte sur <https://openrouter.ai>.
+2. Va sur <https://openrouter.ai/keys> et clique sur **Create Key**.
+3. Donne-lui un nom (ex. `araqiel`) et copie la clé **tout de suite** : elle ne sera plus affichée en entier ensuite. Elle commence par `sk-or-`.
+
+### L'installer
+1. Crée un fichier **`openrouter.key`** dans le dossier indiqué à l'étape 0.
+2. Colle la clé dessus, sur une seule ligne, puis enregistre.
+
+Alternative sans fichier : définir la variable d'environnement `OPENROUTER_API_KEY` (elle est prioritaire sur le fichier).
+
+### Vérifier
+Au lancement, la console affiche une ligne comme :
+
+```
+[ARAQIEL][clé] OPENROUTER_API_KEY chargée depuis fichier openrouter.key — 73 caractères, sk-o...xxxx
+```
+
+Si tu vois `AUCUNE clé trouvée`, le fichier n'est pas au bon endroit ou mal nommé.
+Si tu vois `ne commence pas par 'sk-or-...'`, tu as probablement collé la mauvaise clé.
+
+---
+
+## 2. Clé Gemini (mode codage)
+
+### Obtenir la clé
+1. Va sur **Google AI Studio** : <https://aistudio.google.com/apikey> (connecte-toi avec ton compte Google).
+2. Clique sur **Create API key** (ou *Créer une clé API*) et copie-la.
+
+### L'installer
+Il faut **deux fichiers**, dans le même dossier :
+
+**a) `coder.key`** : la clé Gemini, sur une seule ligne.
+
+**b) `coder.json`** : la configuration du modèle. Copie `coder.example.json` en `coder.json` (ou crée-le) avec ce contenu :
+
+```json
+{
+  "provider": "custom",
+  "base_url": "https://generativelanguage.googleapis.com/v1beta/openai",
+  "model": "gemini-3.8-flash",
+  "max_tokens": 8192,
+  "temperature": null
+}
+```
+
+- `provider: "custom"` : endpoint compatible OpenAI, ici celui de Google. `base_url` est obligatoire dans ce cas.
+- `model` : le nom du modèle Gemini à utiliser. Les noms évoluent : vérifie la liste actuelle sur <https://ai.google.dev/gemini-api/docs/models> si une erreur indique que le modèle n'existe pas.
+- `temperature: null` : la température n'est pas envoyée, le modèle garde sa valeur par défaut.
+
+Alternative sans fichier : variables d'environnement `ARAQIEL_CODER_PROVIDER`, `ARAQIEL_CODER_BASE_URL`, `ARAQIEL_CODER_MODEL` et `ARAQIEL_CODER_KEY`.
+
+### Vérifier
+Au lancement, la console doit afficher :
+
+```
+[ARAQIEL][coder] Agent de code externe ACTIF : custom / gemini-3.8-flash (style openai)
+```
+
+Tu peux aussi ouvrir `http://127.0.0.1:5000/api/status` : le champ `coder` indique `configured: true`, ou la raison du problème dans `problem`.
+
+Ensuite, clique sur **`</> Code`** dans l'application : le bouton devient vert, c'est le mode codage.
+
+> **Repli automatique** : si `coder.json` ou `coder.key` est absent ou invalide, le mode codage utilise les modèles gratuits d'OpenRouter (avec `openrouter.key`). Si ta config Gemini est valide, il n'y a **pas** de repli : une erreur s'affiche clairement.
+
+---
+
+## 3. Dépannage
+
+| Message / symptôme | Cause probable | Solution |
+|---|---|---|
+| `AUCUNE clé trouvée` | Fichier absent, mal nommé ou au mauvais endroit | Vérifie le nom (`.key` et pas `.key.txt`) et le dossier (étape 0) |
+| `HTTP 401` / `403` ("Vérifie ta clé dans coder.key") | Clé invalide, révoquée ou avec un caractère en trop | Recopie la clé, sans espace ni retour à la ligne |
+| `HTTP 429` | Limite de requêtes atteinte | Attends un peu ; les modèles gratuits ont des limites et leur disponibilité change souvent |
+| `HTTP 404` / modèle introuvable | Nom de modèle incorrect ou retiré | Corrige `model` dans `coder.json` |
+| `provider inconnu` / `base_url manquante` | `coder.json` incomplet | Compare avec `coder.example.json` |
+| `coder.json illisible` | JSON invalide (virgule en trop, guillemets manquants) | Valide le fichier sur un validateur JSON |
+| Rien ne change après modification | Le backend lit les clés au démarrage | Ferme et relance Araqiel |
+
+---
+
+## 4. Sécurité
+
+- Ne partage **jamais** tes fichiers `.key` (ni dans une conversation, ni sur GitHub). Le `.gitignore` fourni les exclut déjà du dépôt.
+- Si une clé a été exposée, **révoque-la** (page *Keys* d'OpenRouter, ou AI Studio pour Gemini) et crée-en une nouvelle.
+- Pour limiter les risques, tu peux fixer une limite de dépenses sur ta clé OpenRouter depuis son tableau de bord.
+
+---
+
+## Pour aller plus loin : voix (optionnel)
+
+La voix et la transcription utilisent ElevenLabs : crée `elevenlabs.key` (clé commençant par `sk_`) au même endroit. Sans cette clé, la synthèse vocale bascule sur la voix du navigateur, mais la transcription du micro ne fonctionne pas.
